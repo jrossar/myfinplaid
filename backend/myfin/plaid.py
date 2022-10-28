@@ -1,3 +1,4 @@
+from os import access
 from django.views.decorators.csrf import csrf_exempt
 import time
 import plaid
@@ -25,6 +26,7 @@ from django.http import JsonResponse
 from .handle_models import save_transactions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .views import JWT_authenticator, byte_to_str
+from .models import NewUser
 import jwt
 
 
@@ -169,11 +171,7 @@ class Plaid:
             print('public_token', public_token)
             jwt_token = data['JWT_Token']
             print('JWT_Token', jwt_token)
-            print(jwt.decode(
-                jwt_token,
-                'B13S413OIPOASD1231)&%$&*HHFLKAHSDJK791723012UOF)&%$&*',
-                algorithms='HS256'
-            ))
+
             try:
                 exchange_request = ItemPublicTokenExchangeRequest(
                     public_token=public_token)
@@ -181,6 +179,15 @@ class Plaid:
                     exchange_request)
                 access_token = exchange_response['access_token']
                 item_id = exchange_response['item_id']
+                user_data = jwt.decode(
+                    jwt_token,
+                    'B13S413OIPOASD1231)&%$&*HHFLKAHSDJK791723012UOF)&%$&*',
+                    algorithms='HS256'
+                )
+                user = NewUser.objects.get(id=user_data['userId'])
+                user.access_token = access_token
+                user.save()
+                print(user.access_token)
                 if 'transfer' in self.PLAID_PRODUCTS:
                     transfer_id = self.authorize_and_create_transfer(
                         access_token)
@@ -188,7 +195,7 @@ class Plaid:
             except plaid.ApiException as e:
                 return json.loads(e.body)
 
-    @csrf_exempt
+    @ csrf_exempt
     def get_info(self, request):
         data = {
             'item_id': None,
@@ -202,7 +209,7 @@ class Plaid:
                 'products': self.PLAID_PRODUCTS
             })
 
-    @csrf_exempt
+    @ csrf_exempt
     def get_keys(request):
         KEYS = {
             'client_id': '61647a5be37dd70012bcd2bc',
@@ -213,7 +220,7 @@ class Plaid:
         if request.method == 'GET':
             return JsonResponse(KEYS)
 
-    @csrf_exempt
+    @ csrf_exempt
     def get_transactions(self, request):
         # Pull transactions for the last 30 days
         start_date = (datetime.now() - timedelta(days=30))

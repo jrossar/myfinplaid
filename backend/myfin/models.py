@@ -50,6 +50,9 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField('Is Superuser')
     id = models.AutoField(primary_key=True)
     is_active = models.BooleanField('Is Active', default=True)
+    access_token = models.CharField(
+        'Access_Token', max_length=60, default='no_access_token'
+    )
 
     objects = CustomAccountManager()
 
