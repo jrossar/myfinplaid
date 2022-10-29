@@ -32,7 +32,7 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+import jwt
 from myfin import serializers
 
 # Create your views here.
@@ -212,6 +212,16 @@ def authenticate_user(request):
     if request.method == 'OPTIONS':
         print('hi')
     return JsonResponse({'data': data})
+
+
+def get_user_data(jwt_token):
+    user_data = jwt.decode(
+        jwt_token,
+        'B13S413OIPOASD1231)&%$&*HHFLKAHSDJK791723012UOF)&%$&*',
+        algorithms='HS256'
+    )
+    user = NewUser.objects.get(id=user_data['userId'])
+    return user
 
 
 def get_data(byte_data):

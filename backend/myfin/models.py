@@ -78,3 +78,6 @@ class Transactions(models.Model):
     def __str__(self):
         describe_transaction = f'Trans ID: {self.transaction_id}, Name: {self.name}, Amount: {self.amount}'
         return describe_transaction
+
+
+print(NewUser.objects.all())

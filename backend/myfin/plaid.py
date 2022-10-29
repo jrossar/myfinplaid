@@ -25,7 +25,7 @@ from plaid.model.products import Products
 from django.http import JsonResponse
 from .handle_models import save_transactions
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .views import JWT_authenticator, byte_to_str
+from .views import JWT_authenticator, byte_to_str, get_user_data
 from .models import NewUser
 import jwt
 
@@ -179,12 +179,7 @@ class Plaid:
                     exchange_request)
                 access_token = exchange_response['access_token']
                 item_id = exchange_response['item_id']
-                user_data = jwt.decode(
-                    jwt_token,
-                    'B13S413OIPOASD1231)&%$&*HHFLKAHSDJK791723012UOF)&%$&*',
-                    algorithms='HS256'
-                )
-                user = NewUser.objects.get(id=user_data['userId'])
+                user = get_user_data(jwt_token)
                 user.access_token = access_token
                 user.save()
                 print(user.access_token)
@@ -225,11 +220,19 @@ class Plaid:
         # Pull transactions for the last 30 days
         start_date = (datetime.now() - timedelta(days=30))
         end_date = datetime.now()
-        if request.method == 'GET':
+        print('Get Transactions request.method')
+        print(request.method)
+        if request.method == 'POST':
+            print('INSIDE GET TRANSACTIONS')
+            data = byte_to_str(request.body)
+            data = json.loads(data)
+            print(data)
+            print(data['JWT_Token'])
+            user = get_user_data(data['JWT_Token'])
             try:
                 options = TransactionsGetRequestOptions()
                 plaid_request = TransactionsGetRequest(
-                    access_token=access_token,
+                    access_token=user.access_token,
                     start_date=start_date.date(),
                     end_date=end_date.date(),
                     options=options
@@ -241,6 +244,7 @@ class Plaid:
             except plaid.ApiException as e:
                 error_response = self.format_error(e)
                 return JsonResponse(error_response)
+        return JsonResponse(request)
 
     def handle_transactions(self, transactions):
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')

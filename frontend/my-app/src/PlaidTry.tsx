@@ -70,7 +70,13 @@ const PlaidTry = () => {
     );
 
     const get_transactions = async () => {
-        let response = await fetch('http://127.0.0.1:8000/api/transactions');
+        let response = await fetch('http://127.0.0.1:8000/api/transactions', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            },
+            body: JSON.stringify({ JWT_Token: user.state.accessToken })
+        });
         let data = await response.json();
         if (!data.ok) {
             console.log('Error in get transactions');
