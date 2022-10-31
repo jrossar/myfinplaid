@@ -25,6 +25,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from myfin.UserHandler import UserHandler
 
 
 admin.site.site_header = 'MyFin Administration'
@@ -33,6 +34,8 @@ admin.site.index_title = 'MyFin Site Admin Home'
 
 router = routers.DefaultRouter()
 router.register(r'myfin', views.MyFinView, 'myfin')
+
+user_handler = UserHandler()
 
 my_plaid = plaid.Plaid()
 
@@ -47,9 +50,9 @@ urlpatterns = [
     path('api/set_access_token', my_plaid.get_access_token),
     path('api/transactions', my_plaid.get_transactions),
     path('authenticate_user', views.authenticate_user),
+    path('api/create_account', user_handler.create_user),
     path('user_info', views.user_info),
     path('csrf_cookie', views.GetCSRFToken.as_view()),
-
     path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

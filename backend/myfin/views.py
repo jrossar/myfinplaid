@@ -32,6 +32,7 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from .UserHandler import UserHandler
 import jwt
 from myfin import serializers
 
@@ -227,15 +228,6 @@ def get_user_data(jwt_token):
 def get_data(byte_data):
     data = byte_data(request.body)
     return json.loads(data)
-
-
-@csrf_exempt
-def create_user():
-    user = User.objects.create_user(
-        'myusernmae', 'myemail@crazymail.com', 'mypassword')
-    user.first_name = 'John'
-    user.last_name - 'Citizen'
-    user.save()
 
 
 @csrf_exempt
