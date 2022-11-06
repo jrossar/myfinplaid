@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PlaidTry from './PlaidTry';
 import Login from './Login';
 import { AuthProvider } from './Context/AuthContext';
+import CreateAccount from './CreateUser';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -16,6 +17,7 @@ root.render(
     <Routes>
       <Route path="/" element={<AuthProvider><Login /></AuthProvider>} />
       <Route path="/plaidtry" element={<AuthProvider><PlaidTry /></AuthProvider>} />
+      <Route path="/createaccount" element={<AuthProvider><CreateAccount /></AuthProvider>} />
     </Routes>
   </BrowserRouter>
 );
